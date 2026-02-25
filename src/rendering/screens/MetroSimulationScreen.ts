@@ -47,6 +47,7 @@ export class MetroSimulationScreen extends Container {
   private speed1xButton: FlatButton;
   private speed2xButton: FlatButton;
   private speed4xButton: FlatButton;
+  private shareButton: FlatButton;
 
   private mapRenderer: MapRenderer;
   private metroRenderer: MetroRenderer;
@@ -95,6 +96,17 @@ export class MetroSimulationScreen extends Container {
       },
     });
     this.addChild(this.clockLabel);
+
+    // Share button
+    this.shareButton = new FlatButton({
+      text: "Share",
+      width: 100,
+      height: 40,
+      fontSize: 16,
+      backgroundColor: 0x9b59b6,
+    });
+    this.shareButton.onPress.connect(() => this.openSharePopup());
+    this.addChild(this.shareButton);
 
     // Stop simulation button
     this.stopButton = new FlatButton({
@@ -442,6 +454,40 @@ export class MetroSimulationScreen extends Container {
   }
 
   /**
+   * Open share popup with screenshot and stats
+   */
+  private async openSharePopup(): Promise<void> {
+    if (!this.gameState) return;
+
+    const { engine } = await import("@app/getEngine");
+    const renderer = engine().renderer;
+
+    // Generate base64 screenshot from map container
+    const base64Image = await renderer.extract.base64(this.mapContainer);
+
+    // Calculate stats
+    const days = Math.floor(
+      (this.gameState.simulationTime -
+        new Date(GAME_START_TIME_ISO).getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+    const money = Math.floor(this.gameState.money);
+    const stations = this.gameState.stations.length;
+    const lines = this.gameState.lines.length;
+    const trains = this.gameState.lines.reduce(
+      (acc, line) => acc + (line.trains?.length || 0),
+      0,
+    );
+
+    const statsMessage = `I played Metromap and managed the city for ${days} days, made $${money}, built ${stations} stations, ${lines} lines and ${trains} trains.`;
+
+    const { SharePopup, setShareDataForPopup } =
+      await import("../popups/SharePopup");
+    setShareDataForPopup(base64Image, statsMessage);
+    engine().navigation.presentPopup(SharePopup);
+  }
+
+  /**
    * Layout UI elements
    */
   public resize(width: number, height: number): void {
@@ -460,11 +506,18 @@ export class MetroSimulationScreen extends Container {
     this.clockLabel.x = width - 20;
     this.clockLabel.y = topBarY;
 
-    // Money display to left of clock
+    // Share button
+    this.shareButton.x =
+      this.clockLabel.x -
+      this.clockLabel.width -
+      20 -
+      this.shareButton.width / 2;
+    this.shareButton.y = topBarY;
+
+    // Money display to left of share button
     this.moneyLabel.anchor.set(1, 0.5);
-    const clockLeft = this.clockLabel.x - this.clockLabel.width;
-    const moneyGap = 20;
-    this.moneyLabel.x = clockLeft - moneyGap;
+    const shareLeft = this.shareButton.x - this.shareButton.width / 2;
+    this.moneyLabel.x = shareLeft - 20;
     this.moneyLabel.y = topBarY;
 
     // Controls Row (Y=80)
@@ -531,6 +584,7 @@ export class MetroSimulationScreen extends Container {
       this.titleLabel,
       this.moneyLabel,
       this.clockLabel,
+      this.shareButton,
       this.stopButton,
       this.pauseToggleButton,
       this.speed1xButton,
