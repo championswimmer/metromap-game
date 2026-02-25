@@ -1,18 +1,10 @@
-import { sound } from "@pixi/sound";
 import { ExtensionType } from "pixi.js";
 import type { Application, ExtensionMetadata } from "pixi.js";
 
-import { BGM, SFX } from "./audio";
+import { ProceduralAudio } from "./ProceduralAudio";
 
 /**
  * Middleware for Application's audio functionality.
- *
- * Adds the following methods to Application:
- * * Application#audio
- * * Application#audio.bgm
- * * Application#audio.sfx
- * * Application#audio.getMasterVolume
- * * Application#audio.setMasterVolume
  */
 export class CreationAudioPlugin {
   /** @ignore */
@@ -23,20 +15,7 @@ export class CreationAudioPlugin {
    */
   public static init(): void {
     const app = this as unknown as Application;
-
-    app.audio = {
-      bgm: new BGM(),
-      sfx: new SFX(),
-      getMasterVolume: () => sound.volumeAll,
-      setMasterVolume: (volume: number) => {
-        sound.volumeAll = volume;
-        if (!volume) {
-          sound.muteAll();
-        } else {
-          sound.unmuteAll();
-        }
-      },
-    };
+    app.audio = new ProceduralAudio();
   }
 
   /**
@@ -44,6 +23,9 @@ export class CreationAudioPlugin {
    */
   public static destroy(): void {
     const app = this as unknown as Application;
-    app.audio = null as unknown as Application["audio"];
+    if (app.audio) {
+      app.audio.setVolume(0);
+      app.audio = null as unknown as ProceduralAudio;
+    }
   }
 }

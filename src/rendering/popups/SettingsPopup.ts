@@ -26,12 +26,7 @@ export class SettingsPopup extends Container {
   private versionLabel: Text;
   /** Layout that organises the UI components */
   private layout: List;
-  /** Slider that changes the master volume */
   private masterSlider: VolumeSlider;
-  /** Slider that changes background music volume */
-  private bgmSlider: VolumeSlider;
-  /** Slider that changes sound effects volume */
-  private sfxSlider: VolumeSlider;
 
   constructor() {
     super();
@@ -83,18 +78,6 @@ export class SettingsPopup extends Container {
       userSettings.setMasterVolume(v / 100);
     });
     this.layout.addChild(this.masterSlider);
-
-    this.bgmSlider = new VolumeSlider("BGM Volume");
-    this.bgmSlider.onUpdate.connect((v) => {
-      userSettings.setBgmVolume(v / 100);
-    });
-    this.layout.addChild(this.bgmSlider);
-
-    this.sfxSlider = new VolumeSlider("SFX Volume");
-    this.sfxSlider.onUpdate.connect((v) => {
-      userSettings.setSfxVolume(v / 100);
-    });
-    this.layout.addChild(this.sfxSlider);
   }
 
   /** Resize the popup, fired whenever window size changes */
@@ -108,8 +91,6 @@ export class SettingsPopup extends Container {
   /** Set things up just before showing the popup */
   public prepare() {
     this.masterSlider.value = userSettings.getMasterVolume() * 100;
-    this.bgmSlider.value = userSettings.getBgmVolume() * 100;
-    this.sfxSlider.value = userSettings.getSfxVolume() * 100;
   }
 
   /** Present the popup, animated */

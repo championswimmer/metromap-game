@@ -1,4 +1,4 @@
-import type { BGM, SFX } from "./engine/audio/audio";
+import type { ProceduralAudio } from "./engine/audio/ProceduralAudio";
 import type { Navigation } from "./engine/navigation/navigation";
 import type {
   CreationResizePluginOptions,
@@ -8,12 +8,7 @@ import type {
 declare global {
   namespace PixiMixins {
     interface Application extends DeepRequired<CreationResizePluginOptions> {
-      audio: {
-        bgm: BGM;
-        sfx: SFX;
-        getMasterVolume: () => number;
-        setMasterVolume: (volume: number) => void;
-      };
+      audio: ProceduralAudio;
       navigation: Navigation;
     }
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type

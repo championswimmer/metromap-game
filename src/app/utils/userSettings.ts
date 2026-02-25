@@ -11,9 +11,7 @@ const KEY_VOLUME_SFX = "volume-sfx";
  */
 class UserSettings {
   public init() {
-    engine().audio.setMasterVolume(this.getMasterVolume());
-    engine().audio.bgm.setVolume(this.getBgmVolume());
-    engine().audio.sfx.setVolume(this.getSfxVolume());
+    engine().audio.setVolume(this.getMasterVolume());
   }
 
   /** Get overall sound volume */
@@ -23,7 +21,7 @@ class UserSettings {
 
   /** Set overall sound volume */
   public setMasterVolume(value: number) {
-    engine().audio.setMasterVolume(value);
+    engine().audio.setVolume(value);
     storage.setNumber(KEY_VOLUME_MASTER, value);
   }
 
@@ -32,20 +30,18 @@ class UserSettings {
     return storage.getNumber(KEY_VOLUME_BGM) ?? 1;
   }
 
-  /** Set background music volume */
+  /** Set background music volume (legacy compatibility) */
   public setBgmVolume(value: number) {
-    engine().audio.bgm.setVolume(value);
     storage.setNumber(KEY_VOLUME_BGM, value);
   }
 
-  /** Get sound effects volume */
+  /** Get sound effects volume (legacy compatibility) */
   public getSfxVolume() {
     return storage.getNumber(KEY_VOLUME_SFX) ?? 1;
   }
 
-  /** Set sound effects volume */
+  /** Set sound effects volume (legacy compatibility) */
   public setSfxVolume(value: number) {
-    engine().audio.sfx.setVolume(value);
     storage.setNumber(KEY_VOLUME_SFX, value);
   }
 }

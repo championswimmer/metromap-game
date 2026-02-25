@@ -70,10 +70,10 @@ export class FlatButton extends FancyButton {
   }
 
   private handleHover() {
-    engine().audio.sfx.play("main/sounds/sfx-hover.wav");
+    engine().audio.playUIHover();
   }
 
   private handleDown() {
-    engine().audio.sfx.play("main/sounds/sfx-press.wav");
+    engine().audio.playUIClick();
   }
 }

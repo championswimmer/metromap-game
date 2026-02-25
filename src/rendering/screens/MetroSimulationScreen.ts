@@ -5,6 +5,7 @@
 
 import { Container, Graphics, Ticker } from "pixi.js";
 import { animate } from "motion";
+import { engine } from "@app/getEngine";
 
 import { PixiMapRenderer as MapRenderer } from "@rendering/pixi/PixiMapRenderer";
 import { PixiMetroRenderer as MetroRenderer } from "@rendering/pixi/PixiMetroRenderer";
@@ -234,6 +235,7 @@ export class MetroSimulationScreen extends Container {
    */
   private async stopSimulation(): Promise<void> {
     this.isRunning = false;
+    engine().audio.updateMetroHum(0, 0);
 
     if (!this.gameState) {
       console.warn(
@@ -242,7 +244,6 @@ export class MetroSimulationScreen extends Container {
       // If we don't have game state, we probably shouldn't try to save it or pass it back
       // But we should still navigate back to avoid being stuck
       const { MetroBuildingScreen } = await import("./MetroBuildingScreen");
-      const { engine } = await import("@app/getEngine");
       await engine().navigation.showScreen(MetroBuildingScreen);
       return;
     }
@@ -252,7 +253,6 @@ export class MetroSimulationScreen extends Container {
 
     // Import and navigate to building screen
     const { MetroBuildingScreen } = await import("./MetroBuildingScreen");
-    const { engine } = await import("@app/getEngine");
 
     await engine().navigation.showScreen(MetroBuildingScreen);
     const screen = engine().navigation.currentScreen as InstanceType<
@@ -270,6 +270,7 @@ export class MetroSimulationScreen extends Container {
     this.isPaused = !this.isPaused;
 
     if (this.isPaused) {
+      engine().audio.updateMetroHum(0, 0);
       this.pauseToggleButton.text = "▶";
       (this.pauseToggleButton.defaultView as Graphics).tint = 0x27ae60; // Green for Resume
     } else {
@@ -336,6 +337,13 @@ export class MetroSimulationScreen extends Container {
     // Update trains
     updateTrains(this.gameState, deltaSeconds * movementMultiplier);
     this.updateMetroRenderer(true); // Only update trains
+
+    const activeTrains = this.gameState.lines.reduce((count, line) => {
+      return (
+        count + (line.trains?.filter((t) => t.state === "MOVING").length || 0)
+      );
+    }, 0);
+    engine().audio.updateMetroHum(activeTrains, movementMultiplier);
   };
 
   /**
@@ -551,5 +559,6 @@ export class MetroSimulationScreen extends Container {
   /** Called when screen is removed */
   public onDestroy(): void {
     this.isRunning = false;
+    engine().audio.updateMetroHum(0, 0);
   }
 }

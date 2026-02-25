@@ -18,6 +18,7 @@ import {
   Direction,
   type LineSegment,
 } from "../pathfinding/LinePath";
+import { engine } from "@app/getEngine";
 import { updatePassengerMovement } from "./PassengerMovement";
 import { deductTrainRunningCost } from "./Economics";
 
@@ -141,6 +142,9 @@ export function updateTrains(gameState: GameState, deltaSeconds: number): void {
           // Set state to stopped
           train.state = "STOPPED";
           train.dwellRemaining = TRAIN_STOP_DURATION_SQUARES;
+
+          engine().audio.playStationArrival();
+          setTimeout(() => engine().audio.playDoorChime(), 500);
 
           // Determine next target and direction BEFORE passenger boarding
           // This ensures passengers see the correct direction when deciding to board

@@ -11,6 +11,7 @@ import {
   TRAIN_RUNNING_COST_PER_SQUARE,
   TICKET_REVENUE,
 } from "../config";
+import { engine } from "@app/getEngine";
 
 /**
  * Calculate the total length of a metro line in grid squares
@@ -49,6 +50,7 @@ export function calculateLineLength(
  */
 export function deductStationCost(gameState: GameState): void {
   gameState.money -= STATION_BUILD_COST;
+  engine().audio.playCashRegister();
 }
 
 /**
@@ -58,6 +60,7 @@ export function deductLineCost(gameState: GameState, line: MetroLine): void {
   const lineLength = calculateLineLength(line, gameState);
   const lineCost = lineLength * LINE_BUILD_COST_PER_SQUARE;
   gameState.money -= lineCost;
+  engine().audio.playCashRegister();
 }
 
 /**
