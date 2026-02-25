@@ -106,6 +106,7 @@ export class PixiMetroRenderer extends Container {
     const currentStationIds = new Set(stations.map((s) => s.id));
     for (const [id, label] of this.stationNameLabelCache.entries()) {
       if (!currentStationIds.has(id)) {
+        this.labelsLayer.removeChild(label);
         label.destroy();
         this.stationNameLabelCache.delete(id);
       }
@@ -145,6 +146,7 @@ export class PixiMetroRenderer extends Container {
     const currentStationIds = new Set(stations.map((s) => s.id));
     for (const [id, hitArea] of this.stationHitAreaCache.entries()) {
       if (!currentStationIds.has(id)) {
+        this.stationHitAreasLayer.removeChild(hitArea);
         hitArea.destroy();
         this.stationHitAreaCache.delete(id);
       }
@@ -185,6 +187,7 @@ export class PixiMetroRenderer extends Container {
     const currentStationIds = new Set(stations.map((s) => s.id));
     for (const [id, label] of this.stationPassengerCountCache.entries()) {
       if (!currentStationIds.has(id)) {
+        this.labelsLayer.removeChild(label);
         label.destroy();
         this.stationPassengerCountCache.delete(id);
       }
